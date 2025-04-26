@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   DndContext,
   closestCenter,
@@ -48,6 +48,8 @@ const availableSortFields: { value: keyof Client; label: string }[] = [
   { value: 'updatedAt', label: 'Updated At' }
 ];
 
+const STORAGE_KEY = 'client_sort_order';
+
 export function SortPanel({
   sortFields,
   onRemoveSortField,
@@ -69,6 +71,28 @@ export function SortPanel({
       coordinateGetter: sortableKeyboardCoordinates
     })
   );
+
+  // Load sort order from localStorage on mount
+  useEffect(() => {
+    const savedSortOrder = localStorage.getItem(STORAGE_KEY);
+    if (savedSortOrder) {
+      try {
+        const parsedSortOrder = JSON.parse(savedSortOrder);
+        onUpdateSortFields(parsedSortOrder);
+      } catch (error) {
+        console.error('Failed to parse saved sort order:', error);
+      }
+    }
+  }, []);
+
+  // Save sort order to localStorage whenever it changes
+  useEffect(() => {
+    if (sortFields.length > 0) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(sortFields));
+    } else {
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  }, [sortFields]);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;

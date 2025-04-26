@@ -1,4 +1,4 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode } from 'react';
 import {
   Table,
   TableBody,
@@ -8,7 +8,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Card } from '@/components/ui/card';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { GripVertical } from 'lucide-react';
 import {
   DndContext,
@@ -91,8 +91,6 @@ function SortableRow<T>({ row, columns, index }: SortableRowProps<T>) {
 }
 
 export default function ClientTable<T>({ data, columns }: ClientTableProps<T>) {
-  const [items, setItems] = useState(data);
-
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -105,20 +103,16 @@ export default function ClientTable<T>({ data, columns }: ClientTableProps<T>) {
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
-      const oldIndex = items.findIndex((item) => (item as any).id === active.id);
-      const newIndex = items.findIndex((item) => (item as any).id === over.id);
+      const oldIndex = data.findIndex((item) => (item as any).id === active.id);
+      const newIndex = data.findIndex((item) => (item as any).id === over.id);
 
-      const newItems = [...items];
-      const [removed] = newItems.splice(oldIndex, 1);
-      newItems.splice(newIndex, 0, removed);
-
-      setItems(newItems);
+      console.log(`Moved item from index ${oldIndex} to ${newIndex}`);
     }
   };
 
   return (
     <Card className="animate-in fade-in-50 duration-500 delay-200 translate-y-1 w-full">
-      <ScrollArea className="overflow-auto rounded-md border">
+      <ScrollArea className="overflow-auto rounded-md border max-h-[500px] w-full">
         <Table>
           <TableHeader className="bg-muted/50">
             <TableRow>
@@ -136,12 +130,12 @@ export default function ClientTable<T>({ data, columns }: ClientTableProps<T>) {
             onDragEnd={handleDragEnd}
           >
             <TableBody>
-              {items.length > 0 ? (
+              {data.length > 0 ? (
                 <SortableContext
-                  items={items.map((item) => (item as any).id)}
+                  items={data.map((item) => (item as any).id)}
                   strategy={verticalListSortingStrategy}
                 >
-                  {items.map((row, index) => (
+                  {data.map((row, index) => (
                     <SortableRow
                       key={(row as any).id}
                       row={row}
@@ -163,6 +157,7 @@ export default function ClientTable<T>({ data, columns }: ClientTableProps<T>) {
             </TableBody>
           </DndContext>
         </Table>
+        <ScrollBar orientation="horizontal" />
       </ScrollArea>
     </Card>
   );

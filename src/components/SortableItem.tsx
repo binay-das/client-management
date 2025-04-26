@@ -1,9 +1,9 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, ArrowUp, ArrowDown, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { ArrowUpDown, X, GripVertical } from 'lucide-react';
 import { SortField } from '@/types';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
 
 interface SortableItemProps {
   sortField: SortField;
@@ -19,14 +19,13 @@ export function SortableItem({ sortField, onToggleDirection, onRemove }: Sortabl
     transform,
     transition,
     isDragging
-  } = useSortable({
-    id: sortField.id
-  });
+  } = useSortable({ id: sortField.id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    zIndex: isDragging ? 10 : 1
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 1 : 0,
   };
 
   // Format field name for display (convert camelCase to Title Case)
@@ -41,53 +40,35 @@ export function SortableItem({ sortField, onToggleDirection, onRemove }: Sortabl
       ref={setNodeRef}
       style={style}
       className={cn(
-        'flex items-center gap-2 px-3 py-2 bg-card rounded-md border',
+        'flex items-center justify-between p-2 border rounded-md bg-background',
         'transition-all duration-200 ease-in-out',
         isDragging && 'shadow-lg opacity-80 border-primary'
       )}
-      {...attributes}
     >
-      <div
-        {...listeners}
-        className="cursor-grab active:cursor-grabbing p-1 hover:text-primary touch-none"
-      >
-        <GripVertical size={18} />
+      <div className="flex items-center gap-2" {...attributes} {...listeners}>
+        <GripVertical className="h-4 w-4 text-muted-foreground cursor-grab" />
+        <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
+        <span className="font-medium">{formatFieldName(sortField.field)}</span>
       </div>
-      
-      <div className="flex-1 font-medium">
-        {formatFieldName(sortField.field)}
+      <div className="flex items-center gap-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => onToggleDirection(sortField.id)}
+          className="flex items-center gap-1"
+        >
+          {sortField.direction === 'asc' ? 'A-Z' : 'Z-A'}
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => onRemove(sortField.id)}
+          className="h-8 w-8 p-0"
+        >
+          <X className="h-4 w-4" />
+          <span className="sr-only">Remove</span>
+        </Button>
       </div>
-      
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => onToggleDirection(sortField.id)}
-        className="group"
-      >
-        <span className="sr-only">Toggle sort direction</span>
-        
-        {sortField.direction === 'asc' ? (
-          <ArrowUp
-            size={18}
-            className="text-primary transition-transform group-hover:scale-110"
-          />
-        ) : (
-          <ArrowDown
-            size={18}
-            className="text-primary transition-transform group-hover:scale-110"
-          />
-        )}
-      </Button>
-      
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => onRemove(sortField.id)}
-        className="text-muted-foreground hover:text-destructive transition-colors"
-      >
-        <span className="sr-only">Remove sort field</span>
-        <X size={16} />
-      </Button>
     </div>
   );
 }
