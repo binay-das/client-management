@@ -1,5 +1,4 @@
 import { Client } from '@/types';
-import { v4 as uuidv4 } from 'uuid';
 
 const generateRandomDate = (startDate: Date = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000)) => {
   const end = new Date().getTime();

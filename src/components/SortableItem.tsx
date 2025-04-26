@@ -1,6 +1,6 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, ArrowUpDown, ArrowUp, ArrowDown, X } from 'lucide-react';
+import { GripVertical, ArrowUp, ArrowDown, X } from 'lucide-react';
 import { SortField } from '@/types';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
